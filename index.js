@@ -4,6 +4,10 @@ const app = express()
 
 const route = '/api/persons'
 
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
+
 let notes = [
     {
         "name": "Arto Järvinen",
@@ -46,6 +50,43 @@ app.get(`${route}/:id`, (req, res) => {
         res.status(404).end()
     }
 })
+
+app.delete(`${route}/:id`, (req, res) => {
+    const id = Number(req.params.id)
+    
+    notes = notes.filter(note => note.id !== id)
+    res.status(204).end()
+})
+
+app.post(route, (req, res) => {
+    const id = Math.ceil(Math.random() * 10000)
+    const body = req.body
+
+    const note = {
+        name: body.name,
+        number: body.number,
+        id
+    }
+    if(!body.name) {
+        return res.status(400).json({
+            error: 'missing a name'
+        })
+    }
+    if(!body.number) {
+        return res.status(400).json({
+            error: 'missing a number'
+        })
+    }
+    if(notes.find(n => n.name === note.name)) {
+        return res.status(400).json({
+            error: 'name must be unique'
+        })
+    }
+    notes = notes.concat(note)
+    
+    res.json(note)
+})
+
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`)
