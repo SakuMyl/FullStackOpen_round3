@@ -9,7 +9,19 @@ const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
 
-app.use(morgan('tiny'))
+app.use(morgan((tokens, req, res) => {
+    let t = [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms'
+    ]
+    if(tokens.method(req, res) === 'POST') {
+        t = t.concat(JSON.stringify(req.body))
+    }
+    return t.join(' ')
+}))
 let notes = [
     {
         "name": "Arto Järvinen",
