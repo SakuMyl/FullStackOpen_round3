@@ -30,7 +30,22 @@ let notes = [
 app.get(route, (req, res) => {
     res.json(notes)
 })
+app.get('/info', (req, res) => {
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.end(
+            `Puhelinluettelossa ${notes.length} henkilön tiedot\n${new Date()}`
+        )
+})
 
+app.get(`${route}/:id`, (req, res) => {
+    const id = Number(req.params.id)
+    const note = notes.find(note => note.id === id)
+    if(note) {
+        res.json(note)
+    } else {
+        res.status(404).end()
+    }
+})
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`)
