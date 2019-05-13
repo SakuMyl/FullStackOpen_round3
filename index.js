@@ -1,5 +1,6 @@
 
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 const route = '/api/persons'
@@ -8,6 +9,7 @@ const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
 
+app.use(morgan('tiny'))
 let notes = [
     {
         "name": "Arto Järvinen",
