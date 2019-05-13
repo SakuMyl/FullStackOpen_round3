@@ -1,0 +1,26 @@
+{
+  "name": "fullstackopen_round3",
+  "version": "1.0.0",
+  "description": "Round 3 of the course Fullstack open 2019",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SakuMyl/FullStackOpen_round3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SakuMyl/FullStackOpen_round3/issues"
+  },
+  "homepage": "https://github.com/SakuMyl/FullStackOpen_round3#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}
