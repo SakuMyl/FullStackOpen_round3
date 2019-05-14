@@ -79,6 +79,19 @@ app.delete(`${route}/:id`, (req, res) => {
     res.status(204).end()
 })
 
+app.put(`${route}/:id`, (req, res) => {
+    const body = req.body
+    const note = notes.find(note => note.id === id)
+    notes = notes.map(p => 
+        p.name === body.name ?
+        body : p)
+
+    if(note) {
+        res.json(note)
+    } else {
+        res.status(404).end()
+    }
+})
 app.post(route, (req, res) => {
     const id = Math.ceil(Math.random() * 10000)
     const body = req.body
@@ -109,6 +122,7 @@ app.post(route, (req, res) => {
 })
 
 const PORT = process.env.PORT || 3001
+console.log(PORT)
 
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`)
