@@ -1,1 +1,1 @@
-GET http://limitless-ravine-10130.herokuapp.com/api/persons
+GET http://limitless-ravine-10130.herokuapp.com
