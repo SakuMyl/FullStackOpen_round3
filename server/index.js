@@ -48,6 +48,9 @@ let notes = [
       }
 ]
 
+app.get('/', (req, res) => {
+    res.send('Hello Docker!')
+})
 app.get(route, (req, res) => {
     res.json(notes)
 })
