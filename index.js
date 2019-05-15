@@ -81,12 +81,14 @@ app.delete(`${route}/:id`, (req, res) => {
 
 app.put(`${route}/:id`, (req, res) => {
     const id = Number(req.params.id)
-    console.log(id)
     const body = req.body
     const note = {
         name: body.name,
         number: body.number,
         id
+    }
+    if(!notes.find(n => n.id === id)) {
+        return res.status(404).end()
     }
     notes = notes.map(n => 
         n.id === id ?
