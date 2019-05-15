@@ -81,13 +81,13 @@ app.delete(`${route}/:id`, (req, res) => {
 
 app.put(`${route}/:id`, (req, res) => {
     const id = Number(req.params.id)
+    console.log(id)
     const body = req.body
     const note = {
         name: body.name,
         number: body.number,
         id
     }
-    console.log(note)
     notes = notes.map(n => 
         n.id === id ?
         note : n
@@ -129,7 +129,6 @@ app.post(route, (req, res) => {
 })
 
 const PORT = process.env.PORT || 3001
-console.log(PORT)
 
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`)
