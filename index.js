@@ -80,11 +80,18 @@ app.delete(`${route}/:id`, (req, res) => {
 })
 
 app.put(`${route}/:id`, (req, res) => {
+    const id = Number(req.params.id)
     const body = req.body
-    const note = notes.find(note => note.id === id)
-    notes = notes.map(p => 
-        p.name === body.name ?
-        body : p)
+    const note = {
+        name: body.name,
+        number: body.number,
+        id
+    }
+    console.log(note)
+    notes = notes.map(n => 
+        n.id === id ?
+        note : n
+    )
 
     if(note) {
         res.json(note)
