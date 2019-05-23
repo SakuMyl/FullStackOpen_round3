@@ -71,7 +71,7 @@ app.put(`${route}/:id`, (req, res) => {
     }
     Person.findByIdAndUpdate(req.params.id, person)
         .then(result =>
-            res.json(result)
+            res.json(result.toJSON())
         )
         .catch(err => 
             res.status(404).end()
