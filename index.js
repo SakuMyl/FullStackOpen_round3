@@ -1,8 +1,10 @@
 
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
+const Person = require('./models/person')
 
 const route = '/api/persons'
 
@@ -26,34 +28,15 @@ app.use(morgan((tokens, req, res) => {
     }
     return t.join(' ')
 }))
-let notes = [
-    {
-        "name": "Arto Järvinen",
-        "number": "044-8374984",
-        "id": 1
-      },
-      {
-        "name": "Lea Kutvonen",
-        "number": "050-1234567",
-        "id": 2
-      },
-      {
-        "name": "Arto Hellas",
-        "number": "040-1983571",
-        "id": 3
-      },
-      {
-        "name": "Martti Tienari",
-        "number": "045-1239876",
-        "id": 4
-      }
-]
+
 
 app.get('/', (req, res) => {
-    res.send('Hello Docker!')
+    res.send('Hello World!')
 })
 app.get(route, (req, res) => {
-    res.json(notes)
+    Person.find({}).then(result => 
+        res.json(result)
+    )
 })
 app.get('/info', (req, res) => {
     res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -63,53 +46,44 @@ app.get('/info', (req, res) => {
 })
 
 app.get(`${route}/:id`, (req, res) => {
-    const id = Number(req.params.id)
-    const note = notes.find(note => note.id === id)
-    if(note) {
-        res.json(note)
-    } else {
-        res.status(404).end()
-    }
+    Person.findById(req.params.id)
+        .then(result => {
+            console.log(result)
+            return res.json(result)
+        })
+        .catch(err =>
+            res.status(404).end()
+        )
 })
 
 app.delete(`${route}/:id`, (req, res) => {
-    const id = Number(req.params.id)
-    
-    notes = notes.filter(note => note.id !== id)
-    res.status(204).end()
+    Person.findByIdAndDelete(req.params.id)
+        .then(result => 
+            res.status(204).end()
+        )
 })
 
 app.put(`${route}/:id`, (req, res) => {
-    const id = Number(req.params.id)
     const body = req.body
-    const note = {
+    const person = {
         name: body.name,
-        number: body.number,
-        id
+        number: body.number
     }
-    if(!notes.find(n => n.id === id)) {
-        return res.status(404).end()
-    }
-    notes = notes.map(n => 
-        n.id === id ?
-        note : n
-    )
-
-    if(note) {
-        res.json(note)
-    } else {
-        res.status(404).end()
-    }
+    Person.findByIdAndUpdate(req.params.id, person)
+        .then(result =>
+            res.json(result)
+        )
+        .catch(err => 
+            res.status(404).end()
+        )
 })
 app.post(route, (req, res) => {
-    const id = Math.ceil(Math.random() * 10000)
     const body = req.body
 
-    const note = {
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        id
-    }
+        number: body.number
+    })
     if(!body.name) {
         return res.status(400).json({
             error: 'missing a name'
@@ -120,14 +94,9 @@ app.post(route, (req, res) => {
             error: 'missing a number'
         })
     }
-    if(notes.find(n => n.name === note.name)) {
-        return res.status(400).json({
-            error: 'name must be unique'
-        })
-    }
-    notes = notes.concat(note)
-    
-    res.json(note)
+    person.save().then(result =>
+        res.json(result.toJSON())
+    )
 })
 
 const PORT = process.env.PORT || 3001
