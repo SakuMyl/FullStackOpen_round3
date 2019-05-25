@@ -5,10 +5,9 @@ const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
 const Person = require('./models/person')
+const bodyParser = require('body-parser')
 
 const route = '/api/persons'
-
-const bodyParser = require('body-parser')
 
 app.use(express.static('./build'))
 app.use(bodyParser.json())
@@ -29,7 +28,16 @@ app.use(morgan((tokens, req, res) => {
     return t.join(' ')
 }))
 
-
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message)
+  
+    if (error.name === 'CastError' && error.kind == 'ObjectId') {
+        return res.status(400).send({ error: 'malformatted id' })
+    } 
+  
+    next(error)
+}
+  
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
@@ -40,42 +48,46 @@ app.get(route, (req, res) => {
 })
 app.get('/info', (req, res) => {
     res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.end(
-            `Puhelinluettelossa ${notes.length} henkilön tiedot\n${new Date()}`
-        )
+    Person.find({}).then(result =>
+        res.end(`Puhelinluettelossa ${result.length} henkilön tiedot\n${new Date()}`)
+    )
 })
 
-app.get(`${route}/:id`, (req, res) => {
+app.get(`${route}/:id`, (req, res, next) => {
     Person.findById(req.params.id)
-        .then(result => {
-            console.log(result)
-            return res.json(result)
+        .then(person => {
+            if(person) {
+                res.json(person.toJSON())
+            } else{
+                res.status(404).end()
+            }
         })
-        .catch(err =>
-            res.status(404).end()
-        )
+        .catch(error => next(error))
 })
 
-app.delete(`${route}/:id`, (req, res) => {
+app.delete(`${route}/:id`, (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
         .then(result => 
             res.status(204).end()
         )
+        .catch(error => next(error))
 })
 
-app.put(`${route}/:id`, (req, res) => {
+app.put(`${route}/:id`, (req, res, next) => {
     const body = req.body
     const person = {
         name: body.name,
         number: body.number
     }
     Person.findByIdAndUpdate(req.params.id, person)
-        .then(result =>
-            res.json(result.toJSON())
-        )
-        .catch(err => 
-            res.status(404).end()
-        )
+        .then(oldPerson => {
+            if(oldPerson) {
+                return res.json(oldPerson.toJSON())
+            } else {
+                res.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 app.post(route, (req, res) => {
     const body = req.body
@@ -98,6 +110,8 @@ app.post(route, (req, res) => {
         res.json(result.toJSON())
     )
 })
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 
