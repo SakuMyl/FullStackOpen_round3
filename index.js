@@ -33,7 +33,9 @@ const errorHandler = (error, req, res, next) => {
   
     if (error.name === 'CastError' && error.kind == 'ObjectId') {
         return res.status(400).send({ error: 'malformatted id' })
-    } 
+    } else if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message })
+    }
   
     next(error)
 }
@@ -89,13 +91,14 @@ app.put(`${route}/:id`, (req, res, next) => {
         })
         .catch(error => next(error))
 })
-app.post(route, (req, res) => {
+app.post(route, (req, res, next) => {
     const body = req.body
 
     const person = new Person({
         name: body.name,
         number: body.number
     })
+    /*
     if(!body.name) {
         return res.status(400).json({
             error: 'missing a name'
@@ -106,9 +109,11 @@ app.post(route, (req, res) => {
             error: 'missing a number'
         })
     }
+    */
     person.save().then(result =>
         res.json(result.toJSON())
     )
+        .catch(error => next(error))
 })
 
 app.use(errorHandler)
