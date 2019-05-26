@@ -1,7 +1,7 @@
-POST http://localhost:3001/api/persons
+POST https://limitless-ravine-10130.herokuapp.com/api/persons
 content-type: application/json
 
 {
     "name": "Arto Järvinen",
-    "number": "0243897293"
+    "number": "024"
 }
